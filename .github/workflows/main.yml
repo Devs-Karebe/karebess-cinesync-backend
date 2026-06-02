@@ -16,14 +16,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - Checkout do código
+      - name: Checkout do código
+        uses: actions/checkout@v4
 
-      - Configurar Java 21
+      - name: Configurar Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
 
-      - Dar permissão ao mvnw
+      - name: Dar permissão ao Maven Wrapper
+        run: chmod +x mvnw
 
-      - Executar:
-          ./mvnw clean verify
+      - name: Executar build e testes
+        run: ./mvnw clean verify
 
-      - Executar:
-          docker build .
+      - name: Validar Docker Build
+        run: docker build -t cinesync-backend .
