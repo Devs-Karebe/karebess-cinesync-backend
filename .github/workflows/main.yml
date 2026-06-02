@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - Checkout do código
+
+      - Configurar Java 21
+
+      - Dar permissão ao mvnw
+
+      - Executar:
+          ./mvnw clean verify
+
+      - Executar:
+          docker build .
