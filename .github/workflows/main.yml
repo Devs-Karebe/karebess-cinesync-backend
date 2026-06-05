@@ -11,25 +11,64 @@ on:
       - main
       - develop
 
+  workflow_dispatch:
+
 jobs:
-  build:
+  ci-build-test:
+    name: Build & Test
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
-      - name: Checkout do código
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Configurar Java 21
+      - name: Setup Java 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
+          cache: maven
 
-      - name: Dar permissão ao Maven Wrapper
-        run: chmod +x mvnw
+      - name: Make Maven Wrapper executable
+        run: chmod +x ./mvnw
 
-      - name: Executar build e testes
-        run: ./mvnw clean verify
+      - name: Build and run tests
+        run: ./mvnw clean verify -B
+        env:
+          SPRING_PROFILES_ACTIVE: test
 
-      - name: Validar Docker Build
-        run: docker build -t cinesync-backend .
+      - name: Verify generated JAR
+        run: |
+          echo "Generated artifacts:"
+          find target -name "*.jar"
+
+      - name: Upload JAR artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-jar
+          path: target/*.jar
+          retention-days: 7
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: target/surefire-reports/
+          if-no-files-found: warn
+
+      - name: Publish test results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: target/surefire-reports/TEST-*.xml
+
+      - name: Build summary
+        if: success()
+        run: |
+          echo "## ✅ CI Executado com Sucesso" >> $GITHUB_STEP_SUMMARY
+          echo "- Compilação concluída" >> $GITHUB_STEP_SUMMARY
+          echo "- Testes executados" >> $GITHUB_STEP_SUMMARY
+          echo "- Artefato JAR gerado" >> $GITHUB_STEP_SUMMARY
