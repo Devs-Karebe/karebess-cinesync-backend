@@ -313,6 +313,6 @@ MIT License
 
 ## Contact
 
-- CineSync Team
-- Email: contact@cinesync.com
+- Devs Karebe System
+  - Email: contato@devskarebe.com
 - Website: https://cinesync.com
