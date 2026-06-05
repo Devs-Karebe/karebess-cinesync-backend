@@ -33,6 +33,14 @@ jobs:
       - name: Make Maven Wrapper executable
         run: chmod +x ./mvnw
 
+      - name: Create .env for CI
+        run: |
+          cat > .env << EOF
+          JWT_SECRET=test-secret-key-for-ci
+          JWT_ISSUER=github-actions
+          JWT_EXPIRATION=3600000
+          EOF
+
       - name: Build and run tests
         run: ./mvnw clean verify -B
         env:
