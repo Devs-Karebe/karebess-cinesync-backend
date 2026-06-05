@@ -66,13 +66,7 @@ jobs:
           name: test-reports
           path: target/surefire-reports/
           if-no-files-found: warn
-
-      - name: Publish test results
-        if: always()
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        with:
-          files: target/surefire-reports/TEST-*.xml
-
+          
       - name: Build summary
         if: success()
         run: |
